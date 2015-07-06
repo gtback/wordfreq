@@ -25,4 +25,5 @@ def main():
             f.write(str(x) + '\n')
             print(x)
 
-main()
+if __name__ == '__main__':
+    main()
