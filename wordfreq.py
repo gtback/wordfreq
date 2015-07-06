@@ -2,6 +2,7 @@
 """
 wordfreq.py - Count the frequency of words in text.
 """
+import argparse
 import collections
 import operator
 import sys
@@ -29,18 +30,27 @@ def output_results(word_freqs, outstream):
     for x in word_freqs[:10]:
         outstream.write(str(x) + '\n')
 
+def parse_args():
+    """Parse arguments from the command line."""
+    parser = argparse.ArgumentParser("Count the frequency of words in text.")
+    parser.add_argument('infile', nargs="?", help="Source text. Default: STDIN")
+    parser.add_argument('outfile', nargs="?", help="Result destination. Default: STDOUT")
+
+    return parser.parse_args()
+
 def main():
     """Main wordfreq function."""
-    if len(sys.argv) < 2:
+    args = parse_args()
+    if not args.infile:
         data = sys.stdin.read()
     else:
-        data = read_text(infile=sys.argv[1])
+        data = read_text(infile=args.infile)
     words = count_words(data)
     word_freqs = sort_words(words)
-    if len(sys.argv) < 3:
+    if not args.outfile:
         output_results(word_freqs, outstream=sys.stdout)
     else:
-        with open(sys.argv[2], 'w') as outfile:
+        with open(args.outfile, 'w') as outfile:
             output_results(word_freqs, outstream=outfile)
 
 if __name__ == '__main__':
