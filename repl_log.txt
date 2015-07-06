@@ -1,0 +1,30 @@
+Python 2.7.10 (default, Jun 10 2015, 19:42:47) 
+[GCC 4.2.1 Compatible Apple LLVM 6.1.0 (clang-602.0.53)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> with open('gettysburg.txt') as f:
+...     data = f.read()
+...
+>>> import collections
+>>> words = collections.defaultdict(int)
+>>> for word in data.split():
+...     word = word.strip('-,.').lower()
+...     words[word] += 1
+...
+>>> import operator
+>>> word_freqs = sorted(words.items(), key=operator.itemgetter(1), reverse=True)
+>>> with open('results.txt', 'w') as f:
+...     for x in word_freqs[:10]:
+...         f.write(str(x) + '\n')
+...         print(x)
+...
+('that', 13)
+('the', 11)
+('we', 10)
+('to', 8)
+('here', 8)
+('a', 7)
+('nation', 5)
+('not', 5)
+('for', 5)
+('can', 5)
+>>>
