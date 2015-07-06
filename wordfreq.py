@@ -5,6 +5,7 @@ wordfreq.py - Count the frequency of words in text.
 import argparse
 import collections
 import operator
+import os
 import sys
 
 def read_text(infile):
@@ -33,27 +34,44 @@ def output_results(word_freqs, outstream, count=10):
 def parse_args():
     """Parse arguments from the command line."""
     parser = argparse.ArgumentParser("Count the frequency of words in text.")
-    parser.add_argument('-c', '--count', type=int, default=10,
+    parser.add_argument('-c', '--count', type=int,
                         help="Number of words to report. Default: 10")
     parser.add_argument('infile', nargs="?", help="Source text. Default: STDIN")
     parser.add_argument('outfile', nargs="?", help="Result destination. Default: STDOUT")
 
     return parser.parse_args()
 
+def parse_envvars():
+    """Get options from environment variables."""
+    return {
+        'count': os.environ.get('WF_COUNT'),
+        'infile': os.environ.get('WF_INFILE'),
+        'outfile': os.environ.get('WF_OUTFILE'),
+    }
+
+def wordfreq(count=10, infile=None, outfile=None):
+    if not infile:
+        data = sys.stdin.read()
+    else:
+        data = read_text(infile=infile)
+    words = count_words(data)
+    word_freqs = sort_words(words)
+    if not outfile:
+        output_results(word_freqs, outstream=sys.stdout, count=count)
+    else:
+        with open(outfile, 'w') as outfile:
+            output_results(word_freqs, outstream=outfile, count=count)
+
 def main():
     """Main wordfreq function."""
     args = parse_args()
-    if not args.infile:
-        data = sys.stdin.read()
-    else:
-        data = read_text(infile=args.infile)
-    words = count_words(data)
-    word_freqs = sort_words(words)
-    if not args.outfile:
-        output_results(word_freqs, outstream=sys.stdout, count=args.count)
-    else:
-        with open(args.outfile, 'w') as outfile:
-            output_results(word_freqs, outstream=outfile, count=args.count)
+    env = parse_envvars()
+
+    count = int(args.count or env['count']) or 10
+    infile = args.infile or env['infile'] or None
+    outfile = args.outfile or env['outfile'] or None
+
+    wordfreq(count, infile, outfile)
 
 if __name__ == '__main__':
     main()
