@@ -87,7 +87,12 @@ def main():
     infile = args.infile or env['infile'] or conf.get('infile') or None
     outfile = args.outfile or env['outfile'] or conf.get('outfile') or None
 
-    wordfreq(count, infile, outfile)
+    try:
+        wordfreq(count, infile, outfile)
+        return 0
+    except:
+        print >> sys.stderr, "An error occurred"
+        return 1
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
