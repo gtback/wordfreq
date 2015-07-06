@@ -4,6 +4,7 @@ wordfreq.py - Count the frequency of words in text.
 """
 import argparse
 import collections
+import ConfigParser
 import operator
 import os
 import sys
@@ -49,6 +50,20 @@ def parse_envvars():
         'outfile': os.environ.get('WF_OUTFILE'),
     }
 
+def parse_config(conffile):
+    """Get options from a config file."""
+    config = ConfigParser.ConfigParser()
+    config.read(conffile)
+    options = {}
+    if config.has_option('wordfreq', 'count'):
+        options['count'] = config.getint('wordfreq', 'count')
+    if config.has_option('wordfreq', 'infile'):
+        options['infile'] = config.get('wordfreq', 'infile')
+    if config.has_option('wordfreq', 'outfile'):
+        options['outfile'] = config.get('wordfreq', 'outfile')
+    return options
+
+
 def wordfreq(count=10, infile=None, outfile=None):
     if not infile:
         data = sys.stdin.read()
@@ -66,10 +81,11 @@ def main():
     """Main wordfreq function."""
     args = parse_args()
     env = parse_envvars()
+    conf = parse_config('wordfreq.conf')
 
-    count = int(args.count or env['count']) or 10
-    infile = args.infile or env['infile'] or None
-    outfile = args.outfile or env['outfile'] or None
+    count = int(args.count or env['count'] or conf.get('count')) or 10
+    infile = args.infile or env['infile'] or conf.get('infile') or None
+    outfile = args.outfile or env['outfile'] or conf.get('outfile') or None
 
     wordfreq(count, infile, outfile)
 
